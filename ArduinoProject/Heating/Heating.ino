@@ -7,9 +7,21 @@
 DS3231 clock;
 RTCDateTime dt;
 
-int pinSSRHeizstab = 2;
-int pinSSRWaermePumpe = 3;
-int pinPVSignal = 4;
+const bool isDebug = true;
+
+// OUT
+int const pinSSRHeizstab = 2;
+int const pinSSRWaermePumpe = 3;
+// IN
+const int  pinPVSignal = 4;
+const int pinTasterHeizstab = 5;
+const int pinSZWZ = 6;
+const int pinManual = 13;
+// ANALOG IN
+const int pinTempFuehler = A0;
+const int pinManualStartTime = A1;
+const int pinManualEndTime = A2;
+const int pinManualMaxTemp = A3;
 
 
 bool isHeatPumpOn = false;
@@ -32,16 +44,31 @@ void setup() {
   clock.begin();
   //clock.setDateTime(__DATE__, __TIME__);
 
+ // INIT DIGITAL OUTPUTS
   pinMode(pinSSRHeizstab, OUTPUT); // SSR Heizstab
   pinMode(pinSSRWaermePumpe, OUTPUT); // SSR Waermepumpe
-  pinMode(pinPVSignal, INPUT);  // PV SIGNAL
 
-  pinMode(A0, INPUT); //Temperatur Fuehler
+  // INIT DIGITAL INPUTS
+  pinMode(pinPVSignal, INPUT);  // PV SIGNAL
+  pinMode(pinTasterHeizstab, INPUT);
+  pinMode(pinSZWZ, INPUT);
+  pinMode(pinManual, INPUT);
+
+  // INIT ANALOG INPUTS
+  pinMode(pinTempFuehler, INPUT);
+  pinMode(pinManualStartTime, INPUT);
+  pinMode(pinManualEndTime, INPUT);
+  pinMode(pinManualMaxTemp, INPUT);
+
+  if(isDdebug){
+    Serial.begin(9600);
+    Serial.print("INIT Done");
+  }
 }
 
 void loop() {
   // Calculate Temp (NTC100)
-  rawTemperatur = analogRead(A0);
+  rawTemperatur = analogRead(pinTempFuehler);
   TempDouble = convertRawToTemperature(rawTemperatur, true);
   TempInteger = (int) TempDouble;
 
